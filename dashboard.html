@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Energy Monitor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Smart Energy Monitor Dashboard</h1>
+  <canvas id="energyChart" width="600" height="400"></canvas>
+
+  <script>
+    async function fetchData() {
+      const res = await fetch("/api/data");
+      const data = await res.json();
+      return data.map(row => ({
+        id: row[0],
+        voltage: row[1],
+        current: row[2],
+        power: row[3],
+        time: row[4]
+      }));
+    }
+
+    async function renderChart() {
+      const data = await fetchData();
+      const ctx = document.getElementById('energyChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(d => d.time),
+          datasets: [{
+            label: 'Power (W)',
+            data: data.map(d => d.power),
+            borderColor: 'blue',
+            fill: false
+          }]
+        }
+      });
+    }
+    renderChart();
+  </script>
+</body>
+</html>
